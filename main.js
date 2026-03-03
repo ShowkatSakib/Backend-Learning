@@ -5,7 +5,7 @@ const server = http.createServer((req, res) => {
 
     if(req.url=="/"){   //home url
         
-        fs.writeFile("Demo.txt", "Hello World", function(error){
+        let error= fs.writeFileSync("DemoSync.txt", "Welcome to Hello World file sync")
 
             if(error){
                 
@@ -21,7 +21,7 @@ const server = http.createServer((req, res) => {
                 res.end();
             }
 
-        })      
+      
           
     }
 
