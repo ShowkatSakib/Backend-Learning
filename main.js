@@ -1,18 +1,16 @@
 const http = require("http");
-const URL = require("url");
+const fs = require("fs");
 
 const server = http.createServer((req, res) => {   
 
-    var myURL = "https://www.example.com/products/list?category=electronics&sort=price"
-    
-    var myURLObj = URL.parse(myURL, true);   //parse uesd for split url and it return an object 
+    if(req.url=="/"){
+        fs.readFile("Home.html",function(error, data){      //Asynchronous file read
 
-    var myHostName = myURLObj.host;   //find url host name
-    var myPathName = myURLObj.pathname;   //find url path name
-    var mySearchName = myURLObj.search;   //find url search query name
-
-    res.write(myHostName);
-    res.end();
+        res.writeHead(200, {'content-type':'text/html'});
+        res.write(data);
+        res.end();
+        } );  
+    }
 
 
 });
