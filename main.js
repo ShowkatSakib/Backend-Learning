@@ -3,12 +3,25 @@ const fs = require("fs");
 
 const server = http.createServer((req, res) => {   
 
-    if(req.url=="/"){
+    if(req.url=="/"){   //home url
         
-        var myData= fs.readFileSync("Home.html")      //synchronous file read
-        res.writeHead(200, {'content-type':'text/html'});
-        res.write(myData);
-        res.end();
+        fs.writeFile("Demo.txt", "Hello World", function(error){
+
+            if(error){
+                
+                res.writeHead(200, {'content-type':'text/html'});
+                res.write("File write fail");
+                res.end();
+            }
+
+            else{
+
+                res.writeHead(200, {'content-type':'text/html'});
+                res.write("File write success");
+                res.end();
+            }
+
+        })      
           
     }
 
