@@ -5,21 +5,22 @@ const server = http.createServer((req, res) => {
 
     if(req.url=="/"){   //home url
         
-        var error= fs.renameSync("DemoSync.txt", "DemoSyncNew.txt")
+        fs.unlink("DemoSyncNew.txt", function(error){
 
             if(error){
                 
                 res.writeHead(200, {'content-type':'text/html'});
-                res.write("File rename fail");
+                res.write("File delete fail");
                 res.end();
             }
 
             else{
 
                 res.writeHead(200, {'content-type':'text/html'});
-                res.write("File rename success");
+                res.write("File delete  success");
                 res.end();
             }
+     })
       
           
     }
