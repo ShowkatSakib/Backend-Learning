@@ -4,12 +4,12 @@ const fs = require("fs");
 const server = http.createServer((req, res) => {   
 
     if(req.url=="/"){
-        fs.readFile("Home.html",function(error, data){      //Asynchronous file read
-
+        
+        var myData= fs.readFileSync("Home.html")      //synchronous file read
         res.writeHead(200, {'content-type':'text/html'});
-        res.write(data);
+        res.write(myData);
         res.end();
-        } );  
+          
     }
 
 
