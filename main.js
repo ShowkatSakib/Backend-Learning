@@ -5,7 +5,7 @@ const server = http.createServer((req, res) => {
 
     if(req.url=="/"){   //home url
         
-        fs.unlink("DemoSyncNew.txt", function(error){
+        var error= fs.unlinkSync("DemoAsyncNew.txt")
 
             if(error){
                 
@@ -20,7 +20,6 @@ const server = http.createServer((req, res) => {
                 res.write("File delete  success");
                 res.end();
             }
-     })
       
           
     }
