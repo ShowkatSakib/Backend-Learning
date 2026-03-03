@@ -5,22 +5,22 @@ const server = http.createServer((req, res) => {
 
     if(req.url=="/"){   //home url
         
-        let error= fs.writeFileSync("DemoSync.txt", "Welcome to Hello World file sync")
+        fs.rename("Demo.txt", "DemoAsyncNew.txt", function(error){
 
             if(error){
                 
                 res.writeHead(200, {'content-type':'text/html'});
-                res.write("File write fail");
+                res.write("File rename fail");
                 res.end();
             }
 
             else{
 
                 res.writeHead(200, {'content-type':'text/html'});
-                res.write("File write success");
+                res.write("File rename success");
                 res.end();
             }
-
+})
       
           
     }
