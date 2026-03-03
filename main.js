@@ -1,14 +1,19 @@
 const http = require("http");
+const URL = require("url");
 
 const server = http.createServer((req, res) => {   
-    
-        res.writeHead(200,{'content-type':'application/json'})   //header portion 
-        const user = {    //object
-        name: "Sakib",
-        profession: "Developer"
-    };
 
-    res.end(JSON.stringify(user));   // json respone convert to string
+    var myURL = "https://www.example.com/products/list?category=electronics&sort=price"
+    
+    var myURLObj = URL.parse(myURL, true);   //parse uesd for split url and it return an object 
+
+    var myHostName = myURLObj.host;   //find url host name
+    var myPathName = myURLObj.pathname;   //find url path name
+    var mySearchName = myURLObj.search;   //find url search query name
+
+    res.write(myHostName);
+    res.end();
+
 
 });
 
