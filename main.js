@@ -5,7 +5,7 @@ const server = http.createServer((req, res) => {
 
     if(req.url=="/"){   //home url
         
-        fs.rename("Demo.txt", "DemoAsyncNew.txt", function(error){
+        var error= fs.renameSync("DemoSync.txt", "DemoSyncNew.txt")
 
             if(error){
                 
@@ -20,7 +20,6 @@ const server = http.createServer((req, res) => {
                 res.write("File rename success");
                 res.end();
             }
-})
       
           
     }
