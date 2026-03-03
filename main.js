@@ -5,7 +5,7 @@ const server = http.createServer((req, res) => {
 
     if(req.url=="/"){   //home url
         
-        var result = fs.existsSync("Demo.txt")    //return result type
+        fs.exists("DemoABC.txt", function(result){   //return result type
 
             if(result){
                 
@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
                 res.write("File does not exist");
                 res.end();
             }
-      
+      }) 
           
     }
 
