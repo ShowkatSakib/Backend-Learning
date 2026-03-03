@@ -3,30 +3,37 @@ const fs = require("fs");
 
 const server = http.createServer((req, res) => {   
 
-    if(req.url=="/"){   //home url
-        
-        fs.exists("DemoABC.txt", function(result){   //return result type
+    if(req.url=="/"){
 
-            if(result){
-                
-                res.writeHead(200, {'content-type':'text/html'});
-                res.write("File exist");
-                res.end();
-            }
+        let data= fs.readFileSync("Home.html","utf-8")   //utf-8 is a character set
+        res.end(data);
 
-            else{
-
-                res.writeHead(200, {'content-type':'text/html'});
-                res.write("File does not exist");
-                res.end();
-            }
-      }) 
-          
     }
+    else if(req.url=="/About"){
+
+        let data= fs.readFileSync("About.html","utf-8")   //utf-8 is a character set
+        res.end(data);
+
+    }
+    else if(req.url=="/Contact"){
+
+        let data= fs.readFileSync("Contact.html","utf-8")   //utf-8 is a character set
+        res.end(data);
+
+    }
+    else if(req.url=="/Terms"){
+
+        let data= fs.readFileSync("Terms.html","utf-8")   //utf-8 is a character set
+        res.end(data);
+
+    }
+
 
 
 });
 
-server.listen(3000, () => {   //port number 3000
-    console.log("Server running at http://localhost:3000");
+const PORT = process.env.PORT || 3000;   //works on real hosting server or local host 3000
+
+server.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
