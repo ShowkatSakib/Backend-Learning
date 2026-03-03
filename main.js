@@ -5,19 +5,19 @@ const server = http.createServer((req, res) => {
 
     if(req.url=="/"){   //home url
         
-        var error= fs.unlinkSync("DemoAsyncNew.txt")
+        var result = fs.existsSync("Demo.txt")    //return result type
 
-            if(error){
+            if(result){
                 
                 res.writeHead(200, {'content-type':'text/html'});
-                res.write("File delete fail");
+                res.write("File exist");
                 res.end();
             }
 
             else{
 
                 res.writeHead(200, {'content-type':'text/html'});
-                res.write("File delete  success");
+                res.write("File does not exist");
                 res.end();
             }
       
