@@ -2,11 +2,27 @@ const express = require("express");
 
 const app = express();
 
-app.get("/products", (req, res) => {
+app.get("/one", (req, res) => {
 
-    const category = req.query.category;    // query use to send extra information to the server
+    res.send("Simple string response");   // res.send mens response body
 
-    res.send("Category: " + category);
+});
+
+app.post("/two", (req, res) => {
+
+    res.send("Simple string response");
+
+});
+
+app.get("/three", (req, res) => {
+
+    res.end("Simple string response");   // res.end mens response ending point
+
+});
+
+app.post("/four", (req, res) => {
+
+    res.end("Simple string response");
 
 });
 
