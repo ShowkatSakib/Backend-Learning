@@ -1,35 +1,20 @@
 const express = require("express");
+const bodyParser = require("body-parser")
 
 const app = express();
+app.use(bodyParser.json());    //use json from bodyparser method
 
-//simple post request----------------------------------------------------
+
 app.post("/", (req, res) => {
 
-    res.send("Simple post request response");   
+    let jsonData = req.body;  
+    let jsonString = JSON.stringify(jsonData);   //json data convert into string
+    res.send(jsonString)
 
 });
 
 
-//url parameter post request----------------------------------------------------
-app.post("/first", (req, res) => {
 
-    let firstName= req.query.firstName;
-    let lastName= req.query.lastName;
-
-    res.send(firstName+" "+ lastName);   
-
-});
-
-
-//post request header----------------------------------------------------
-app.post("/second", (req, res) => {
-
-    let userName= req.header.userName;
-    let password= req.header.password;
-
-    res.send("User Name:"+ userName+" "+ "Password:" + password);   
-
-});
 
 
 
