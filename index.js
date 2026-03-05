@@ -81,6 +81,21 @@ app.get("/india", (req, res) => {
 });
 
 
+
+//response header----------------------------------------------------
+app.get("/nine", (req, res) => {
+
+    //header
+    res.append("name","sakib");    //key value pair
+    res.append("ciry","dhaka");    
+    res.append("occupation","student");  
+
+    //status code 201 and body has hello
+    res.status(201).end("hello");
+
+});
+
+
 app.listen(3000, () => {    //localhost port 3000
     console.log("Server running on port 3000");
 });
