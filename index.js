@@ -87,7 +87,7 @@ app.get("/nine", (req, res) => {
 
     //header
     res.append("name","sakib");    //key value pair
-    res.append("ciry","dhaka");    
+    res.append("city","dhaka");    
     res.append("occupation","student");  
 
     //status code 201 and body has hello
@@ -99,12 +99,23 @@ app.get("/nine", (req, res) => {
 //response cookie set----------------------------------------------------
 app.get("/ten", (req, res) => {
 
-    //header
     res.cookie("name","sakib");    //key value pair
-    res.cookie("ciry","dhaka");    
+    res.cookie("city","dhaka");    
     res.cookie("occupation","student");  
 
     res.end("cookie set success");
+
+});
+
+
+//response cookie set----------------------------------------------------
+app.get("/eleven", (req, res) => {
+
+    res.clearCookie("name");   //property name which should be clear
+    res.clearCookie("city");   
+
+
+    res.end("clear cookie success");
 
 });
 
