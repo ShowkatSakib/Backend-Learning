@@ -96,6 +96,19 @@ app.get("/nine", (req, res) => {
 });
 
 
+//response cookie set----------------------------------------------------
+app.get("/ten", (req, res) => {
+
+    //header
+    res.cookie("name","sakib");    //key value pair
+    res.cookie("ciry","dhaka");    
+    res.cookie("occupation","student");  
+
+    res.end("cookie set success");
+
+});
+
+
 app.listen(3000, () => {    //localhost port 3000
     console.log("Server running on port 3000");
 });
