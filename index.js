@@ -1,34 +1,23 @@
 const express = require("express");
-const multer = require("multer");
 
 
-const app = express();   //creates an express application that will handle HTTP requests
+const app = express();   
 
-var storage = multer.diskStorage({      //store uploaded files on disk (server folder)
-    destination:function(req, file, callBack){
-        callBack(null,"./upload")  //where the uploaded file will be stored
-    },
-    filename:function(req, file, callBack){
-        callBack(null, file.originalname)  //save the file with its original name
-    }
+app.use(function(req,res,next){   //common middle ware
+    console.log("application level middleware")
+    next();
 })
 
+app.get("/", (req, res) => {     
+    res.send("Home page");  
+});
 
-var upload = multer({storage:storage}).single("myfile");   //accept one file from a form field named myfile
+app.get("/about", (req, res) => {    
+    res.send("About Page");
+});
 
-
-
-app.post("/", (req, res) => {
-
-    upload(req,res,function(error){
-        if(error){
-            res.send("file upload fail")
-        }
-        else{
-            res.send("file upload success")
-        }
-    });
-
+app.get("/contact", (req, res) => {   
+    res.send("Contact Page");
 });
 
 
