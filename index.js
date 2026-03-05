@@ -67,6 +67,20 @@ app.get("/eight", (req, res) => {
 });
 
 
+//response redircet----------------------------------------------------
+app.get("/bangladesh", (req, res) => {
+
+    res.redirect("http://localhost:3000/india")    //give url name where ridirect
+
+});
+
+app.get("/india", (req, res) => {
+
+    res.send("This is india")    
+
+});
+
+
 app.listen(3000, () => {    //localhost port 3000
     console.log("Server running on port 3000");
 });
