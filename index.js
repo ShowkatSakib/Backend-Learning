@@ -3,8 +3,8 @@ const express = require("express");
 
 const app = express();   
 
-app.use(function(req,res,next){   //common middle ware
-    console.log("application level middleware")
+app.use("/about",function(req,res,next){   //middle ware for about route
+    console.log("middleware gor about route")
     next();
 })
 
