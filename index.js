@@ -1,8 +1,11 @@
 const express = require("express");
-const bodyParser = require("body-parser")
+const multer = require("multer");
 
-const app = express();
-app.use(bodyParser.json());    //use json from bodyparser method
+var upload = multer();    //creates a multer middleware instance
+const app = express();   //creates an express application that will handle HTTP requests.
+app.use(upload.array());
+app.use(express.static("public"));
+
 
 
 app.post("/", (req, res) => {
@@ -12,9 +15,6 @@ app.post("/", (req, res) => {
     res.send(jsonString)
 
 });
-
-
-
 
 
 
