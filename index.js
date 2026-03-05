@@ -27,6 +27,7 @@ app.post("/four", (req, res) => {
 
 });
 
+
 //Status code response----------------------------------------------------
 app.get("/five", (req, res) => {
 
@@ -39,6 +40,24 @@ app.get("/six", (req, res) => {
     res.status(201).end();   
 
 });
+
+
+
+//json response----------------------------------------------------
+app.get("/seven", (req, res) => {
+
+    let myJsonArray=[
+        {   name:"sakib",
+            city:"Dhaka"
+        },
+        {   name:"Rakib",
+            city:"chandpur"
+        }
+    ]
+    res.json(myJsonArray);    //call json array 
+
+});
+
 
 app.listen(3000, () => {    //localhost port 3000
     console.log("Server running on port 3000");
