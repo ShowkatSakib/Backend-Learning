@@ -2,11 +2,11 @@ const express = require("express");
 
 const app = express();
 
-app.get("/users/:id", (req, res) => {
+app.get("/products", (req, res) => {
 
-    const userId = req.params.id;    // params use to capture dynamic values from url
+    const category = req.query.category;    // query use to send extra information to the server
 
-    res.send("User ID: " + userId);
+    res.send("Category: " + category);
 
 });
 
