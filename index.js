@@ -59,6 +59,14 @@ app.get("/seven", (req, res) => {
 });
 
 
+//download response----------------------------------------------------
+app.get("/eight", (req, res) => {
+
+    res.download("./uploads/goku.jpg")    //give file path
+
+});
+
+
 app.listen(3000, () => {    //localhost port 3000
     console.log("Server running on port 3000");
 });
