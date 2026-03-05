@@ -2,16 +2,16 @@ const express = require("express");
 
 const app = express();
 
-//simple get request----------------------------------------------------
-app.get("/", (req, res) => {
+//simple post request----------------------------------------------------
+app.post("/", (req, res) => {
 
-    res.send("Simple get request response");   
+    res.send("Simple post request response");   
 
 });
 
 
-//url parameter get request----------------------------------------------------
-app.get("/first", (req, res) => {
+//url parameter post request----------------------------------------------------
+app.post("/first", (req, res) => {
 
     let firstName= req.query.firstName;
     let lastName= req.query.lastName;
@@ -21,13 +21,13 @@ app.get("/first", (req, res) => {
 });
 
 
-//get request header----------------------------------------------------
-app.get("/second", (req, res) => {
+//post request header----------------------------------------------------
+app.post("/second", (req, res) => {
 
-    let firstName= req.header.firstName;
-    let lastName= req.header.lastName;
+    let userName= req.header.userName;
+    let password= req.header.password;
 
-    res.send(firstName+" "+ lastName);   
+    res.send("User Name:"+ userName+" "+ "Password:" + password);   
 
 });
 
