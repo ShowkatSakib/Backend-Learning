@@ -2,20 +2,12 @@ const express = require("express");
 
 const app = express();
 
-app.get("/", (req, res) => {    //get method call  and home url call
-    res.send("Home pagSe");  //send method call
-});
+app.get("/users/:id", (req, res) => {
 
-app.post("/about", (req, res) => {    //post method call and about url
-    res.send("About Page");
-});
+    const userId = req.params.id;    // params use to capture dynamic values from url
 
-app.put("/contact", (req, res) => {   //contact url
-    res.send("Contact Page");
-});
+    res.send("User ID: " + userId);
 
-app.delete("/terms", (req, res) => {   //terms url
-    res.send("Terms Page");
 });
 
 app.listen(3000, () => {    //localhost port 3000
