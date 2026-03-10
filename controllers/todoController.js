@@ -6,14 +6,15 @@ exports.getTodos = (req, res) => {
 };
 
 // GET todo by id
-exports.getTodoById = (req, res) => {
+exports.getTodoById = (req, res, next) => {
 
   const id = parseInt(req.params.id);   //Gets ID from URL and convert it into integer
 
   const todo = todos.find(t => t.id === id);
 
   if (!todo) {
-    return res.status(404).json({ message: "Todo not found" });
+    const error = new Error("Todo not found");
+    return next(error); // pass error to middleware
   }
 
   res.json(todo);
@@ -34,14 +35,14 @@ exports.createTodo = (req, res) => {
 };
 
 // UPDATE todo
-exports.updateTodo = (req, res) => {
+exports.updateTodo = (req, res, next) => {
 
   const id = parseInt(req.params.id);
 
   const todo = todos.find(t => t.id === id);
 
   if (!todo) {
-    return res.status(404).json({ message: "Todo not found" });
+    return next(new Error("Todo not found"));
   }
 
   todo.task = req.body.task;
@@ -51,14 +52,14 @@ exports.updateTodo = (req, res) => {
 };
 
 // DELETE todo
-exports.deleteTodo = (req, res) => {
+exports.deleteTodo = (req, res,next) => {
 
   const id = parseInt(req.params.id);
 
   const index = todos.findIndex(t => t.id === id);    //Returns the position of the todo in the array
 
   if (index === -1) {
-    return res.status(404).json({ message: "Todo not found" });
+    return next(new Error("Todo not found"));
   }
 
   todos.splice(index, 1);   //removes the item from the array
