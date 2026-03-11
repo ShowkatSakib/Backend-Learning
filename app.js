@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 
 const todoRoutes = require("./routes/todoRoutes");   //contains all user-related endpoints (like GET, POST, PUT, DELETE)
 
@@ -6,6 +7,8 @@ const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
+// enable CORS so frontend can call backend
+app.use(cors());
 
 // JSON parser first
 app.use(express.json());   //configure middleware to parse JSON

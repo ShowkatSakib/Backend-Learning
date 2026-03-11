@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Todo App</title>
+
+<script src="https://cdn.tailwindcss.com"></script>  
+
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white shadow-xl rounded-xl p-8 w-[400px]">
+
+<h1 class="text-3xl font-bold text-center mb-6 text-gray-700">Todo App</h1>
+
+<div class="flex gap-2 mb-4">
+<input type="text" id="taskInput" placeholder="Enter todo"
+class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+
+<button onclick="addTodo()"
+class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
+Add
+</button>
+</div>
+
+<ul id="todoList" class="space-y-2"></ul>
+
+</div>
+
+<script>
+
+const API_URL = "http://localhost:3000/todos";
+
+// load todos when page starts
+window.onload = loadTodos;
+
+
+// GET todos  -- fetch todos from the backend server
+function loadTodos(){
+
+ fetch(API_URL)
+ .then(res => res.json())
+ .then(data => {
+
+   const list = document.getElementById("todoList");   //Gets the HTML element where todos will be displayed
+
+   list.innerHTML = "";   //Clears the existing list before adding new todos
+
+   data.forEach(todo => {
+
+     const li = document.createElement("li");    //Creates a <li> element
+
+     li.className = "flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg";
+
+     li.textContent = todo.task;  //Displays the task text
+
+     // delete button
+     const delBtn = document.createElement("button"); 
+     delBtn.textContent = "Delete";
+
+     delBtn.className = "bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition";
+
+     delBtn.onclick = () => deleteTodo(todo.id);
+
+     //add button
+     li.appendChild(delBtn);
+
+     list.appendChild(li);
+
+   });
+
+ });
+
+}
+
+
+// CREATE todo
+function addTodo(){
+
+ const task = document.getElementById("taskInput").value;    //Gets the value from the input field
+
+ fetch(API_URL, {
+
+   method: "POST",
+
+   headers: {
+     "Content-Type": "application/json"
+   },
+
+   body: JSON.stringify({
+     task: task
+   })
+
+ })
+ .then(res => res.json())
+ .then(() => {
+
+   loadTodos();
+
+   document.getElementById("taskInput").value = "";  //After adding the todo the input box is cleared
+
+ });
+
+}
+
+
+// DELETE todo
+function deleteTodo(id){
+
+ fetch(`${API_URL}/${id}`, {
+
+   method: "DELETE"
+
+ })
+ .then(() => loadTodos());
+
+}
+
+</script>
+
+</body>
+
+</html>
