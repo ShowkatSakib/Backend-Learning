@@ -1,68 +1,72 @@
-const todos = require("../models/todoModel");
+const { db } = require("../db");      //for query operation using db
+const { todos } = require("../db/schema");   // to access todos table from database
+const { eq } = require("drizzle-orm");  // to write where condition
 
 // GET all todos
-exports.getTodos = (req, res) => {
-  res.json(todos);
+exports.getTodos = async (req, res) => {    
+
+  const result = await db.select().from(todos);
+  res.json(result);
 };
 
 // GET todo by id
-exports.getTodoById = (req, res, next) => {
+exports.getTodoById = async (req, res, next) => {
 
   const id = parseInt(req.params.id);   //Gets ID from URL and convert it into integer
 
-  const todo = todos.find(t => t.id === id);
+  const todo = await db.select().from(todos).where(eq(todos.id, id));
 
-  if (!todo) {
+  if (!todo.length) {
     const error = new Error("Todo not found");
     return next(error); // pass error to middleware
   }
 
-  res.json(todo);
+  res.json(todo[0]);
 };
 
 // CREATE new todo
-exports.createTodo = (req, res) => {
+exports.createTodo = async (req, res) => {
 
-  const newTodo = {
-    id: todos.length + 1,   //automatically generated
+  const newTodo = await db.insert(todos).values({
     task: req.body.task,    //taken from request body
     completed: false       //default value = false
-  };
+  }).returning();     //new row return
 
-  todos.push(newTodo);   //push means add
-
-  res.status(201).json(newTodo);
+  res.status(201).json(newTodo[0]);
 };
 
 // UPDATE todo
-exports.updateTodo = (req, res, next) => {
+exports.updateTodo = async (req, res, next) => {
 
   const id = parseInt(req.params.id);
 
-  const todo = todos.find(t => t.id === id);
+ const updated = await db.update(todos)
+    .set({
+      task: req.body.task,
+      completed: req.body.completed
+    })
+    .where(eq(todos.id, id))
+    .returning();
 
-  if (!todo) {
+  if (!updated.length) {
     return next(new Error("Todo not found"));
   }
 
-  todo.task = req.body.task;
-  todo.completed = req.body.completed;
-
-  res.json(todo);
+  res.json(updated[0]);
 };
 
 // DELETE todo
-exports.deleteTodo = (req, res,next) => {
+exports.deleteTodo = async (req, res,next) => {
 
   const id = parseInt(req.params.id);
 
-  const index = todos.findIndex(t => t.id === id);    //Returns the position of the todo in the array
+  const deleted = await db.delete(todos)
+    .where(eq(todos.id, id))
+    .returning();
 
-  if (index === -1) {
+  if (!deleted.length) {
     return next(new Error("Todo not found"));
   }
-
-  todos.splice(index, 1);   //removes the item from the array
 
   res.json({ message: "Todo deleted successfully" });
 };

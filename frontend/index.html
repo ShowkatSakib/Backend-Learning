@@ -38,87 +38,120 @@ window.onload = loadTodos;
 
 // GET todos  -- fetch todos from the backend server
 function loadTodos(){
-
  fetch(API_URL)
  .then(res => res.json())
  .then(data => {
+   const list = document.getElementById("todoList");
+   list.innerHTML = ""; 
 
-   const list = document.getElementById("todoList");   //Gets the HTML element where todos will be displayed
-
-   list.innerHTML = "";   //Clears the existing list before adding new todos
-
-   data.forEach(todo => {
-
-     const li = document.createElement("li");    //Creates a <li> element
-
+   data.forEach((todo, index) => {  // index gives serial number
+     const li = document.createElement("li");
      li.className = "flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg";
 
-     li.textContent = todo.task;  //Displays the task text
+     // Serial + Task container
+     const spanContainer = document.createElement("div");
+     spanContainer.className = "flex items-center gap-2";
+
+     const serial = document.createElement("span");
+     serial.textContent = index + 1 + "."; // serial number
+     serial.className = "font-semibold";
+
+     const taskSpan = document.createElement("span");
+     taskSpan.textContent = todo.task;
+     taskSpan.id = `task-${todo.id}`;
+
+     spanContainer.appendChild(serial);
+     spanContainer.appendChild(taskSpan);
+
+     li.appendChild(spanContainer);
+
+     // update button
+     const updateBtn = document.createElement("button");
+     updateBtn.textContent = "Update";
+     updateBtn.className = "bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded";
+
+     updateBtn.onclick = () => makeEditable(todo.id);
 
      // delete button
      const delBtn = document.createElement("button"); 
      delBtn.textContent = "Delete";
-
      delBtn.className = "bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition";
-
      delBtn.onclick = () => deleteTodo(todo.id);
 
-     //add button
-     li.appendChild(delBtn);
+     const btnGroup = document.createElement("div");
+     btnGroup.className = "flex gap-2";
+     btnGroup.appendChild(updateBtn);
+     btnGroup.appendChild(delBtn);
+
+     li.appendChild(btnGroup);
 
      list.appendChild(li);
-
    });
-
  });
-
 }
-
 
 // CREATE todo
 function addTodo(){
-
- const task = document.getElementById("taskInput").value;    //Gets the value from the input field
+ const task = document.getElementById("taskInput").value;
+ if(!task) return;
 
  fetch(API_URL, {
-
    method: "POST",
-
-   headers: {
-     "Content-Type": "application/json"
-   },
-
-   body: JSON.stringify({
-     task: task
-   })
-
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ task: task })
  })
  .then(res => res.json())
  .then(() => {
-
    loadTodos();
-
-   document.getElementById("taskInput").value = "";  //After adding the todo the input box is cleared
-
+   document.getElementById("taskInput").value = "";
  });
-
 }
 
+// make task editable
+function makeEditable(id){
+ const span = document.getElementById(`task-${id}`);
+ const currentTask = span.textContent;
+
+ // create input box
+ const input = document.createElement("input");
+ input.type = "text";
+ input.value = currentTask;
+ input.className = "border border-gray-300 rounded px-2 py-1";
+
+ // replace span with input
+ span.replaceWith(input);
+ input.focus();
+
+ // save on enter key
+ input.addEventListener("keypress", function(e){
+   if(e.key === "Enter"){
+     const newTask = input.value;
+     fetch(`${API_URL}/${id}`, {
+       method: "PUT",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ task: newTask, completed:false })
+     }).then(()=> loadTodos());
+   }
+ });
+
+ // optional: save on blur
+ input.addEventListener("blur", function(){
+   const newTask = input.value;
+   fetch(`${API_URL}/${id}`, {
+     method: "PUT",
+     headers: { "Content-Type": "application/json" },
+     body: JSON.stringify({ task: newTask, completed:false })
+   }).then(()=> loadTodos());
+ });
+}
 
 // DELETE todo
 function deleteTodo(id){
-
- fetch(`${API_URL}/${id}`, {
-
-   method: "DELETE"
-
- })
+ fetch(`${API_URL}/${id}`, { method: "DELETE" })
  .then(() => loadTodos());
-
 }
 
 </script>
 
 </body>
-
 </html>
