@@ -3,23 +3,67 @@
 
 <head>
 <title>Todo App</title>
-
 <script src="https://cdn.tailwindcss.com"></script>  
-
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen gap-4">
 
-<div class="bg-white shadow-xl rounded-xl p-8 w-[400px]">
+<!-- MESSAGE BOX -->
+<div id="messageBox" class="hidden px-4 py-2 rounded text-white"></div>
+
+<!-- REGISTER BOX -->
+<div class="bg-white shadow-xl rounded-xl p-4 w-[400px]">
+
+<h2 class="text-xl font-bold mb-2 text-center">Register</h2>
+
+<input type="text" id="regEmail" placeholder="Email"
+class="w-full mb-2 border px-3 py-2 rounded">
+
+<input type="password" id="regPassword" placeholder="Password"
+class="w-full mb-2 border px-3 py-2 rounded">
+
+<button onclick="register()"
+class="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600">
+Register
+</button>
+
+</div>
+
+<!-- LOGIN BOX -->
+<div class="bg-white shadow-xl rounded-xl p-4 w-[400px]">
+
+<h2 class="text-xl font-bold mb-2 text-center">Login</h2>
+
+<input type="text" id="email" placeholder="Email"
+class="w-full mb-2 border px-3 py-2 rounded">
+
+<input type="password" id="password" placeholder="Password"
+class="w-full mb-2 border px-3 py-2 rounded">
+
+<button onclick="login()"
+class="bg-green-500 text-white px-4 py-2 rounded w-full hover:bg-green-600">
+Login
+</button>
+
+</div>
+
+<!-- LOGOUT -->
+<button onclick="logout()"
+class="bg-red-500 text-white px-4 py-2 rounded">
+Logout
+</button>
+
+<!-- TODO APP (PROTECTED) -->
+<div id="todoSection" class="bg-white shadow-xl rounded-xl p-8 w-[400px] hidden">
 
 <h1 class="text-3xl font-bold text-center mb-6 text-gray-700">Todo App</h1>
 
 <div class="flex gap-2 mb-4">
 <input type="text" id="taskInput" placeholder="Enter todo"
-class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
+class="flex-1 border border-gray-300 rounded-lg px-3 py-2">
 
 <button onclick="addTodo()"
-class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition">
+class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
 Add
 </button>
 </div>
@@ -32,54 +76,171 @@ Add
 
 const API_URL = "http://localhost:3000/todos";
 
-// load todos when page starts
-window.onload = loadTodos;
+
+// ================= MESSAGE =================
+function showMessage(text, type){
+
+ const box = document.getElementById("messageBox");
+ box.classList.remove("hidden");
+
+ box.textContent = text;
+
+ if(type === "error"){
+   box.className = "bg-red-500 px-4 py-2 rounded text-white";
+ } else {
+   box.className = "bg-green-500 px-4 py-2 rounded text-white";
+ }
+
+ setTimeout(() => box.classList.add("hidden"), 3000);
+}
 
 
-// GET todos  -- fetch todos from the backend server
+// ================= TOKEN =================
+function getToken(){
+ return localStorage.getItem("token");
+}
+
+
+// ================= INIT =================
+window.onload = () => {
+  const token = getToken();
+
+  if (!token || token === "null") {
+    showMessage("Please login first", "error");
+    return;
+  }
+
+  document.getElementById("todoSection").classList.remove("hidden");
+
+  loadTodos();
+};
+
+
+// ================= REGISTER =================
+function register(){
+
+ const email = document.getElementById("regEmail").value;
+ const password = document.getElementById("regPassword").value;
+
+ if(!email || !password){
+   return showMessage("Please fill all fields", "error");
+ }
+
+ fetch("http://localhost:3000/auth/register", {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ email, password })
+ })
+ .then(async res => {
+   const data = await res.json();
+
+   if(!res.ok){
+     return showMessage(data.message, "error");
+   }
+
+   showMessage("Registered successfully", "success");
+ });
+}
+
+
+// ================= LOGIN =================
+function login(){
+
+ const email = document.getElementById("email").value;
+ const password = document.getElementById("password").value;
+
+ if(!email || !password){
+   return showMessage("Please fill all fields", "error");
+ }
+
+ fetch("http://localhost:3000/auth/login", {
+   method: "POST",
+   headers: { "Content-Type": "application/json" },
+   body: JSON.stringify({ email, password })
+ })
+ .then(async res => {
+   const data = await res.json();
+
+   if(!res.ok){
+     return showMessage(data.message, "error");
+   }
+
+   localStorage.setItem("token", data.token);
+
+   showMessage("Login successful", "success");
+
+   document.getElementById("todoSection").classList.remove("hidden");
+
+   loadTodos();
+ });
+}
+
+
+// ================= LOGOUT =================
+function logout(){
+ localStorage.removeItem("token");
+ document.getElementById("todoSection").classList.add("hidden");
+ document.getElementById("todoList").innerHTML = "";
+ showMessage("Logged out", "success");
+}
+
+
+// ================= LOAD TODOS =================
 function loadTodos(){
- fetch(API_URL)
- .then(res => res.json())
- .then(data => {
-   const list = document.getElementById("todoList");
-   list.innerHTML = ""; 
 
-   data.forEach((todo, index) => {  // index gives serial number
+ fetch(API_URL, {
+   headers: {
+     Authorization: `Bearer ${getToken()}`
+   }
+ })
+ .then(async res => {
+
+   if(res.status === 401){
+     logout();
+     return [];
+   }
+
+   return res.json();
+ })
+ .then(data => {
+
+   const list = document.getElementById("todoList");
+   list.innerHTML = "";
+
+   data.forEach((todo, index) => {
+
      const li = document.createElement("li");
      li.className = "flex justify-between items-center bg-gray-100 px-3 py-2 rounded-lg";
 
-     // Serial + Task container
-     const spanContainer = document.createElement("div");
-     spanContainer.className = "flex items-center gap-2";
+     const left = document.createElement("div");
+     left.className = "flex gap-2 items-center";
 
      const serial = document.createElement("span");
-     serial.textContent = index + 1 + "."; // serial number
-     serial.className = "font-semibold";
+     serial.textContent = (index + 1) + ".";
+     serial.className = "font-bold";
 
-     const taskSpan = document.createElement("span");
-     taskSpan.textContent = todo.task;
-     taskSpan.id = `task-${todo.id}`;
+     const span = document.createElement("span");
+     span.textContent = todo.task;
+     span.id = `task-${todo.id}`;
 
-     spanContainer.appendChild(serial);
-     spanContainer.appendChild(taskSpan);
+     left.appendChild(serial);
+     left.appendChild(span);
 
-     li.appendChild(spanContainer);
-
-     // update button
-     const updateBtn = document.createElement("button");
-     updateBtn.textContent = "Update";
-     updateBtn.className = "bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded";
-
-     updateBtn.onclick = () => makeEditable(todo.id);
-
-     // delete button
-     const delBtn = document.createElement("button"); 
-     delBtn.textContent = "Delete";
-     delBtn.className = "bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition";
-     delBtn.onclick = () => deleteTodo(todo.id);
+     li.appendChild(left);
 
      const btnGroup = document.createElement("div");
      btnGroup.className = "flex gap-2";
+
+     const updateBtn = document.createElement("button");
+     updateBtn.textContent = "Update";
+     updateBtn.className = "bg-yellow-500 text-white px-2 rounded";
+     updateBtn.onclick = () => makeEditable(todo.id);
+
+     const delBtn = document.createElement("button");
+     delBtn.textContent = "Delete";
+     delBtn.className = "bg-red-500 text-white px-2 rounded";
+     delBtn.onclick = () => deleteTodo(todo.id);
+
      btnGroup.appendChild(updateBtn);
      btnGroup.appendChild(delBtn);
 
@@ -90,64 +251,72 @@ function loadTodos(){
  });
 }
 
-// CREATE todo
+
+// ================= CREATE =================
 function addTodo(){
+
  const task = document.getElementById("taskInput").value;
- if(!task) return;
+
+ if(!task){
+   return showMessage("Task required", "error");
+ }
 
  fetch(API_URL, {
    method: "POST",
-   headers: { "Content-Type": "application/json" },
-   body: JSON.stringify({ task: task })
+   headers: {
+     "Content-Type": "application/json",
+     Authorization: `Bearer ${getToken()}`
+   },
+   body: JSON.stringify({ task })
  })
- .then(res => res.json())
  .then(() => {
    loadTodos();
    document.getElementById("taskInput").value = "";
  });
 }
 
-// make task editable
+
+// ================= UPDATE =================
 function makeEditable(id){
+
  const span = document.getElementById(`task-${id}`);
- const currentTask = span.textContent;
+ const current = span.textContent;
 
- // create input box
  const input = document.createElement("input");
- input.type = "text";
- input.value = currentTask;
- input.className = "border border-gray-300 rounded px-2 py-1";
+ input.value = current;
+ input.className = "border px-2 py-1 rounded";
 
- // replace span with input
  span.replaceWith(input);
  input.focus();
 
- // save on enter key
- input.addEventListener("keypress", function(e){
-   if(e.key === "Enter"){
-     const newTask = input.value;
-     fetch(`${API_URL}/${id}`, {
-       method: "PUT",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ task: newTask, completed:false })
-     }).then(()=> loadTodos());
-   }
- });
-
- // optional: save on blur
- input.addEventListener("blur", function(){
-   const newTask = input.value;
+ function save(){
    fetch(`${API_URL}/${id}`, {
      method: "PUT",
-     headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({ task: newTask, completed:false })
-   }).then(()=> loadTodos());
+     headers: {
+       "Content-Type": "application/json",
+       Authorization: `Bearer ${getToken()}`
+     },
+     body: JSON.stringify({ task: input.value, completed:false })
+   }).then(() => loadTodos());
+ }
+
+ input.addEventListener("keypress", e => {
+   if(e.key === "Enter") save();
  });
+
+ input.addEventListener("blur", save);
 }
 
-// DELETE todo
+
+// ================= DELETE =================
 function deleteTodo(id){
- fetch(`${API_URL}/${id}`, { method: "DELETE" })
+
+ fetch(`${API_URL}/${id}`, {
+   method: "DELETE",
+   headers: {
+     Authorization: `Bearer ${getToken()}`
+   }
+ })
  .then(() => loadTodos());
 }
 

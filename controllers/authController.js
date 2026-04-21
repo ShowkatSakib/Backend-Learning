@@ -10,56 +10,74 @@ const { users } = require("../db/schema");
 const { eq } = require("drizzle-orm");
 
 
-// REGISTER 
+//  REGISTER 
 exports.register = async (req, res) => {
 
-  // get email and password from request body
-  const { email, password } = req.body;
+  try {
 
-  // hash the password (security)
-  const hashedPassword = await bcrypt.hash(password, 10);
-  // 10 = salt rounds (more secure but slower)
+    // get email and password from request body
+    const { email, password } = req.body;
 
-  // insert new user into database
-  const newUser = await db.insert(users).values({
-    email,
-    password: hashedPassword
-  }).returning();   // return inserted data
+    // check if user already exists
+    const existingUser = await db.select().from(users).where(eq(users.email, email));
 
-  // send created user as response
-  res.json(newUser[0]);
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // hash the password (security)
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // insert new user into database
+    const newUser = await db.insert(users).values({
+      email,
+      password: hashedPassword
+    }).returning();
+
+    // send created user as response
+    res.status(201).json(newUser[0]);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 
-// LOGIN 
+//LOGIN 
 exports.login = async (req, res) => {
 
-  // get email and password from request body
-  const { email, password } = req.body;
+  try {
 
-  // find user in database by email
-  const user = await db.select().from(users).where(eq(users.email, email));
+    // get email and password from request body
+    const { email, password } = req.body;
 
-  // if user not found
-  if (!user.length) {
-    return res.status(401).json({ message: "User not found" });
+    // find user in database by email
+    const user = await db.select().from(users).where(eq(users.email, email));
+
+    // if user not found
+    if (!user.length) {
+      return res.status(401).json({ message: "User not found" });
+    }
+
+    // compare entered password with hashed password in DB
+    const isMatch = await bcrypt.compare(password, user[0].password);
+
+    // if password is wrong
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // CREATE JWT TOKEN
+    const token = jwt.sign(
+      { id: user[0].id },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    // send token to frontend
+    res.json({ token });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-
-  // compare entered password with hashed password in DB
-  const isMatch = await bcrypt.compare(password, user[0].password);
-
-  // if password is wrong
-  if (!isMatch) {
-    return res.status(401).json({ message: "Invalid password" });
-  }
-
-  // CREATE JWT TOKEN
-  const token = jwt.sign(
-    { id: user[0].id },          // payload (store user id)
-    process.env.JWT_SECRET,      // secret key from .env
-    { expiresIn: "1h" }          // token valid for 1 hour
-  );
-
-  // send token to frontend
-  res.json({ token });
 };
